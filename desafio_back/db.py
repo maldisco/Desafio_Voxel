@@ -24,7 +24,7 @@ if __name__ == '__main__':
     # Criação da tabela (só executar uma vez)
     Products.metadata.create_all(engine)
 
-        # Inserção de produtos no banco de dados
+    # Inserção de produtos no banco de dados
     with Session(engine) as session:
         for product in products:
             new_product = Products(Id=product['id'], Title=product['title'], Category=product['category'], Price=product['price'])

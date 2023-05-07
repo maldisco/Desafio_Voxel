@@ -1,6 +1,7 @@
 import requests, random
 from sqlalchemy import create_engine, select, func
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import OperationalError
 from db import Products
 
 if __name__ == '__main__':
@@ -10,7 +11,11 @@ if __name__ == '__main__':
     # Calcular preço médio dos smartphones a partir do banco
     with Session(engine) as session:
         query = select(func.avg(Products.Price)).where(Products.Category == 'smartphones')
-        average_price = session.execute(query).scalar()
+        try:
+            average_price = session.execute(query).scalar()
+        except OperationalError:
+            print('\033[91mBanco de dados não encontrado. Execute o arquivo db.py para criar.\033[0m')
+            exit()
         print('## Resultado da coleta de dados ##')
         print(f'Preço médio dos smartphones: $ {average_price}.')
 
