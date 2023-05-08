@@ -1,6 +1,7 @@
 import requests
 from sqlalchemy import String, create_engine
 from sqlalchemy.orm import Mapped, mapped_column, DeclarativeBase, Session
+from sqlalchemy.exc import IntegrityError
 
 class Base(DeclarativeBase):
     pass
@@ -19,7 +20,7 @@ class Products(Base):
 if __name__ == '__main__':
     # Coleta de dados
     products = requests.get('https://dummyjson.com/products').json()['products']
-    engine = create_engine('sqlite:///products.db', echo=True)
+    engine = create_engine('sqlite:///products.db', echo=False)
 
     # Criação da tabela (só executar uma vez)
     Products.metadata.create_all(engine)
@@ -29,5 +30,9 @@ if __name__ == '__main__':
         for product in products:
             new_product = Products(Id=product['id'], Title=product['title'], Category=product['category'], Price=product['price'])
             session.add(new_product)
-            
-        session.commit()
+        
+        try:
+            session.commit()
+            print('\033[92mBanco de dados criado com sucesso.\033[0m')
+        except IntegrityError:
+            print('\033[91mBanco de dados já foi criado.\033[0m')
